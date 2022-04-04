@@ -16,10 +16,10 @@ if __name__ == "__main__":
     # print("file downloaded")
     # print(file)
 
-    start_time = 0
+    start_time = 3
     piano = PianoKeyboard()
-    row = 650
-    source = os.path.join(SAMPLE_INPUTS, "Wejdene Anissa - Piano Cover Tutorial Lyrics (AuPianofr).mp4")
+    row = 550
+    source = os.path.join(SAMPLE_INPUTS, "Giornos Theme (easy).mp4")
     clip = VideoFileClip(source)
     clip = clip.subclip(t_start=start_time)
     print(f"clip res: {clip.w}x{clip.h}")
@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
         active_changes = changes
     
-    mid.save(os.path.join(SAMPLE_OUTPUTS, "Wejdene Anissa - Piano Cover Tutorial Lyrics (AuPianofr).mid"))
+    mid.save(os.path.join(SAMPLE_OUTPUTS, "Giornos Theme (easy).mid"))
 
 
 # clip = clip.fl_image()
