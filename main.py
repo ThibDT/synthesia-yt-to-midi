@@ -9,13 +9,22 @@ if __name__ == "__main__":
     from utils import VideoController
     from mido import Message, MidiFile, MidiTrack
 
+
+    # from pytube import YouTube
+    # yt = YouTube('https://www.youtube.com/watch?v=q9_BHpYolLE')
+    # file = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download(output_path=SAMPLE_INPUTS)
+    # print("file downloaded")
+    # print(file)
+
     start_time = 0
     piano = PianoKeyboard()
-    
-    source = os.path.join(SAMPLE_INPUTS, "synthesia.mp4")
+    row = 650
+    source = os.path.join(SAMPLE_INPUTS, "Wejdene Anissa - Piano Cover Tutorial Lyrics (AuPianofr).mp4")
     clip = VideoFileClip(source)
     clip = clip.subclip(t_start=start_time)
-    clip = crop(clip, x1=0, y1=600, x2=clip.w, y2=601)
+    print(f"clip res: {clip.w}x{clip.h}")
+
+    clip = crop(clip, x1=0, y1=row, x2=clip.w, y2=row+1)
     video_controller = VideoController(clip)
     video_controller.calibrate()
 
@@ -28,7 +37,7 @@ if __name__ == "__main__":
 
     last_msg_time = 0
 
-    for frame_diff in video_controller.changes():
+    for frame_diff in video_controller.changes(color_diff_treshold=100):
         current_time = int((frame_diff["frame"] / video_controller.video.fps) * 1000)
         changes = set(frame_diff["areas"])
 
@@ -36,15 +45,15 @@ if __name__ == "__main__":
         notes_off = active_changes.difference(changes)
 
         for note in notes_on:
-            track.append(Message('note_on', note= 21 + 12 + note, velocity=127, time=int((current_time - last_msg_time))))
+            track.append(Message('note_on', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
             last_msg_time = current_time
         for note in notes_off:
-            track.append(Message('note_off', note= 21 + 12 + note, velocity=127, time=int((current_time - last_msg_time))))
+            track.append(Message('note_off', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
             last_msg_time = current_time
 
         active_changes = changes
     
-    mid.save(f'{SAMPLE_OUTPUTS}/a heart made of yarn.mid')
+    mid.save(os.path.join(SAMPLE_OUTPUTS, "Wejdene Anissa - Piano Cover Tutorial Lyrics (AuPianofr).mid"))
 
 
 # clip = clip.fl_image()

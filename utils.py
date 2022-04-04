@@ -12,7 +12,7 @@ class VideoController:
         self._uniformized_frame = self._uniformize_keys_color(self._calibration_frame)
         self._identify_areas(self._uniformized_frame)
 
-    def _uniformize_keys_color(self, frame, tolerance=80):
+    def _uniformize_keys_color(self, frame, tolerance=100):
         new_frame = frame.copy()
         for i, px in enumerate(frame[0]):  # working on 1 px height frames
             if(px.mean() >= (255 - tolerance)):
@@ -22,7 +22,7 @@ class VideoController:
 
         return new_frame
 
-    def _identify_areas(self, frame, min_length=5):
+    def _identify_areas(self, frame, min_length=3):
         tmp_area = {
             "id": 1,
             "color": None,
@@ -50,6 +50,7 @@ class VideoController:
             if m == 255 or m == 0:
                 tmp_area["color"] = m
                 tmp_area["px_indexes"].append(i)
+        print(f"{len(self.areas)} keys identified")
 
     def changes(self, color_diff_treshold=100):
         for i, frame in enumerate(self.video.iter_frames()):
@@ -65,5 +66,4 @@ class VideoController:
                 b = abs(px_mean[2] - area["px_mean"][2])
                 if r > color_diff_treshold or g > color_diff_treshold or b > color_diff_treshold:
                     changes["areas"].append(area["id"])
-            
             yield changes
