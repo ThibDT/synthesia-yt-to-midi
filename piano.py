@@ -5,6 +5,25 @@ class PianoKeyboard:
         pattern = ["A", ["A#", "Bb"], "B", "C", ["C#", "Db"],
                    "D", ["D#", "Eb"], "E", "F", ["F#", "Gb"], "G", ["G#", "Ab"]]
 
+        modes = {
+            "major": {
+                "pattern": [2,2,1,2,2,2,1],
+                "scales": ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"]
+            },
+            "harmonic major": {
+                "pattern": [],
+                "":
+            },
+            "melodic minor": {
+                "pattern": [],
+                "":
+            },
+            "harmonic minor": {
+                "pattern": [],
+                "":
+            }
+        }
+
         self.keys = [
             {
                 "id": i,
