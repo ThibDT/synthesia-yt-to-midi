@@ -8,30 +8,59 @@ if __name__ == "__main__":
     from piano import PianoKeyboard
     from utils import VideoController
     from mido import Message, MidiFile, MidiTrack
-
-
-    # from pytube import YouTube
-    # yt = YouTube('https://www.youtube.com/watch?v=q9_BHpYolLE')
-    # file = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download(output_path=SAMPLE_INPUTS)
-    # print("file downloaded")
-    # print(file)
-
-    start_time = 1
+    from pytube import YouTube
+    from pytube.exceptions import RegexMatchError
+    import sys
+    import ntpath
+    start_time = 0
     piano = PianoKeyboard()
-    row = 600
-    source = os.path.join(SAMPLE_INPUTS, "Giornos Theme (hard).mp4")
+    y_pos = 600
+    source = None
+    base_name = None
+
+
+    try:
+        source_url = sys.argv[1]
+        yt = YouTube(source_url)
+        stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+        print(f"Downloading {stream.default_filename}")
+        source = stream.download(output_path=SAMPLE_INPUTS)
+    except(IndexError):
+        print("You must provide a youtube video url")
+        exit(1)
+    except RegexMatchError:
+        print(f"Invalid url: {sys.argv[1]}")
+        exit(1)
+
+    if("-s" in sys.argv or "--start" in sys.argv):
+        try:
+            start_arg_index = (sys.argv.index("-s") if("-s" in sys.argv) else sys.argv.index("--start")) + 1 
+            start_time = sys.argv[start_arg_index]
+        except(IndexError):
+            print("You must provide a start time when using the start option")
+            exit(1)
+
+    if("-y" in sys.argv):
+        try:
+            y_arg_index = sys.argv.index("-y") + 1 
+            start_time = sys.argv[y_arg_index]
+        except(IndexError):
+            print("You must provide a y position for the row of pixel to be analized when using the y option")
+            exit(1)
+
+
+    base_name = ntpath.basename(source).replace("mp4", "mid")
+    
     clip = VideoFileClip(source)
     clip = clip.subclip(t_start=start_time)
-    print(f"clip res: {clip.w}x{clip.h}")
 
-    clip = crop(clip, x1=0, y1=row, x2=clip.w, y2=row+1)
+    clip = crop(clip, x1=0, y1=y_pos, x2=clip.w, y2=y_pos+1)
     video_controller = VideoController(clip)
     video_controller.calibrate()
 
     mid = MidiFile()
     track = MidiTrack()
     mid.tracks.append(track)
-    # track.append(Message('program_change', program=12, time=0))
 
     active_changes = set()
 
@@ -53,12 +82,10 @@ if __name__ == "__main__":
 
         active_changes = changes
     
-    mid.save(os.path.join(SAMPLE_OUTPUTS, "Giornos Theme (hard).mid"))
+    mid.save(os.path.join(SAMPLE_OUTPUTS, base_name))
+    print(f"{base_name} saved in {SAMPLE_OUTPUTS}")
 
 
 # clip = clip.fl_image()
-
-
 # clip.save_frame("frame_processed.png")
-
 # clip.write_videofile("cropped2.mp4")
