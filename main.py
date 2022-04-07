@@ -12,6 +12,8 @@ if __name__ == "__main__":
     from pytube.exceptions import RegexMatchError
     import sys
     import ntpath
+
+    
     start_time = 0
     piano = PianoKeyboard()
     y_pos = 600
@@ -59,14 +61,16 @@ if __name__ == "__main__":
     video_controller.calibrate()
 
     mid = MidiFile()
-    track = MidiTrack()
-    mid.tracks.append(track)
+    LHTrack = MidiTrack()
+    RHTrack = MidiTrack()
+    mid.tracks.append(LHTrack)
+    mid.tracks.append(RHTrack)
 
     active_changes = set()
 
     last_msg_time = 0
 
-    for frame_diff in video_controller.changes(color_diff_treshold=100):
+    for frame_diff in video_controller.changes(color_diff_treshold=75):
         current_time = int((frame_diff["frame"] / video_controller.video.fps) * 1000)
         changes = set(frame_diff["areas"])
 
@@ -74,10 +78,10 @@ if __name__ == "__main__":
         notes_off = active_changes.difference(changes)
 
         for note in notes_on:
-            track.append(Message('note_on', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
+            RHTrack.append(Message('note_on', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
             last_msg_time = current_time
         for note in notes_off:
-            track.append(Message('note_off', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
+            RHTrack.append(Message('note_off', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
             last_msg_time = current_time
 
         active_changes = changes

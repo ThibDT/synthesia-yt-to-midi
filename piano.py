@@ -12,15 +12,15 @@ class PianoKeyboard:
             },
             "harmonic major": {
                 "pattern": [],
-                "":
+                "scales": ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"]
             },
             "melodic minor": {
                 "pattern": [],
-                "":
+                "scales": ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"]
             },
             "harmonic minor": {
                 "pattern": [],
-                "":
+                "scales": ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"]
             }
         }
 
