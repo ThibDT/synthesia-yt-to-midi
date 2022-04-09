@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if("-y" in sys.argv):
         try:
             y_arg_index = sys.argv.index("-y") + 1 
-            start_time = sys.argv[y_arg_index]
+            y_pos = float(sys.argv[y_arg_index])
         except(IndexError):
             print("You must provide a y position for the row of pixel to be analized when using the y option")
             exit(1)
