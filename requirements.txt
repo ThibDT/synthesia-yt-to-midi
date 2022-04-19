@@ -1,4 +1,5 @@
-mido==1.2.10
-moviepy==1.0.3
-opencv-python==4.5.5.64
-pytube==12.0.0
+mido
+moviepy
+opencv-python
+pytube
+colormath
