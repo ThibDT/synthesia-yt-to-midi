@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+
+
 if __name__ == "__main__":
     import os
     from conf import SAMPLE_INPUTS, SAMPLE_OUTPUTS
@@ -19,6 +21,7 @@ if __name__ == "__main__":
     y_pos = 600
     source = None
     base_name = None
+    offset = 0
 
 
     try:
@@ -50,6 +53,13 @@ if __name__ == "__main__":
             print("You must provide a y position for the row of pixel to be analized when using the y option")
             exit(1)
 
+    if("-o" in sys.argv or "--offset" in sys.argv):
+        try:
+            o_arg_index = (sys.argv.index("-o") if("-o" in sys.argv) else sys.argv.index("--offset")) + 1
+            offset = int(sys.argv[o_arg_index])
+        except(IndexError):
+            print("You must provide an offset number when using the offset option")
+            exit(1)
 
     base_name = ntpath.basename(source).replace("mp4", "mid")
     
@@ -78,14 +88,18 @@ if __name__ == "__main__":
         notes_off = active_changes.difference(changes)
 
         for note in notes_on:
-            RHTrack.append(Message('note_on', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
+            msg_time = current_time - last_msg_time
+            msg_note = 21 + offset + note
+            RHTrack.append(Message('note_on', note=msg_note, velocity=65, time=msg_time))
             last_msg_time = current_time
         for note in notes_off:
-            RHTrack.append(Message('note_off', note= 21 + note, velocity=65, time=int((current_time - last_msg_time))))
+            msg_time = current_time - last_msg_time
+            msg_note = 21 + offset + note
+            RHTrack.append(Message('note_off', note=msg_note, velocity=0, time=msg_time))
             last_msg_time = current_time
 
         active_changes = changes
-    
+
     mid.save(os.path.join(SAMPLE_OUTPUTS, base_name))
     print(f"{base_name} saved in {SAMPLE_OUTPUTS}")
 
@@ -93,3 +107,4 @@ if __name__ == "__main__":
 # clip = clip.fl_image()
 # clip.save_frame("frame_processed.png")
 # clip.write_videofile("cropped2.mp4")
+

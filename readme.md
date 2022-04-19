@@ -25,3 +25,11 @@ The script use a one pixel height row, this row should include a keyboard with c
 ```
 python main.py (youtube url video) [-y] y_position
 ```
+
+
+##### Offset
+Use --offset option or its shorthand -o to offset the keyboard starting key. 
+Default to 0, first key identified in the video is then supposed to be first key on a full piano keyboard (A)
+```
+python main.py (youtube url video) [-o --offset] offset
+```

@@ -1,3 +1,4 @@
+from moviepy.editor import ImageClip
 
 class VideoController:
 
@@ -11,6 +12,7 @@ class VideoController:
         self._calibration_frame = self.video.get_frame(0)
         self._uniformized_frame = self._uniformize_keys_color(self._calibration_frame)
         self._identify_areas(self._uniformized_frame)
+        #ImageClip(self._uniformized_frame).save_frame("frame_processed.png")
 
     def _uniformize_keys_color(self, frame, tolerance=100):
         new_frame = frame.copy()
@@ -58,12 +60,13 @@ class VideoController:
                 "frame": i,
                 "areas": []
             }
+            
             for area in self.areas:
-                
                 px_mean = frame[0][area["start"]:area["end"]].mean(axis=0)
                 r = abs(px_mean[0] - area["px_mean"][0])
                 g = abs(px_mean[1] - area["px_mean"][1])
                 b = abs(px_mean[2] - area["px_mean"][2])
                 if r > color_diff_treshold or g > color_diff_treshold or b > color_diff_treshold:
                     changes["areas"].append(area["id"])
+
             yield changes
