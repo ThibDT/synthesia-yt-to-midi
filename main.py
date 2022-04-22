@@ -7,8 +7,7 @@ if __name__ == "__main__":
     from conf import SAMPLE_INPUTS, SAMPLE_OUTPUTS
     from moviepy.editor import VideoFileClip
     from moviepy.video.fx.all import crop
-    from piano import PianoKeyboard
-    from utils import VideoController
+    from utils import KeyboardVideoController
     from mido import Message, MidiFile, MidiTrack
     from pytube import YouTube
     from pytube.exceptions import RegexMatchError
@@ -17,17 +16,17 @@ if __name__ == "__main__":
 
     
     start_time = 0
-    piano = PianoKeyboard()
     y_pos = 600
     source = None
     base_name = None
     offset = 0
+    screenshot = False
 
 
     try:
         source_url = sys.argv[1]
         yt = YouTube(source_url)
-        stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+        stream = yt.streams.filter(file_extension='mp4').order_by('resolution').desc().first()
         print(f"Downloading {stream.default_filename}")
         source = stream.download(output_path=SAMPLE_INPUTS)
     except(IndexError):
@@ -61,14 +60,18 @@ if __name__ == "__main__":
             print("You must provide an offset number when using the offset option")
             exit(1)
 
+    if("--screenshot" in sys.argv):
+        screenshot = True
+
     base_name = ntpath.basename(source).replace("mp4", "mid")
     
     clip = VideoFileClip(source)
     clip = clip.subclip(t_start=start_time)
-
     clip = crop(clip, x1=0, y1=y_pos, x2=clip.w, y2=y_pos+1)
-    video_controller = VideoController(clip)
-    video_controller.calibrate()
+    frames_nb = round(clip.fps * clip.duration)
+
+    video_controller = KeyboardVideoController(clip)
+    video_controller.calibrate(screenshot=screenshot)
 
     mid = MidiFile()
     LHTrack = MidiTrack()
@@ -77,10 +80,10 @@ if __name__ == "__main__":
     mid.tracks.append(RHTrack)
 
     active_changes = set()
-
     last_msg_time = 0
 
-    for frame_diff in video_controller.changes(color_diff_treshold=75):
+    print("Generating midi...")
+    for frame_diff in video_controller.changes():
         current_time = int((frame_diff["frame"] / video_controller.video.fps) * 1000)
         changes = set(frame_diff["areas"])
 
@@ -100,8 +103,10 @@ if __name__ == "__main__":
 
         active_changes = changes
 
+
+
     mid.save(os.path.join(SAMPLE_OUTPUTS, base_name))
-    print(f"{base_name} saved in {SAMPLE_OUTPUTS}")
+    print(f"\r\n{base_name} saved in {SAMPLE_OUTPUTS}")
 
 
 # clip = clip.fl_image()
